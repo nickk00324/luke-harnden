@@ -1,0 +1,41 @@
+backend:
+  repo: nickk00324/luke-harnden
+  name: git-gateway
+  branch: main
+
+media_folder: data/images
+
+collections:
+  - name: work
+    label: Works
+    folder: data/works
+    media_folder: images/{{slug}}
+    create: true
+    editor:
+      preview: false
+    fields:
+      - { name: date, label: Date, widget: datetime }
+      - { name: title, label: Title, required: false }
+      - { name: description, label: Description, widget: markdown, required: false }
+      - { name: medium, label: Medium, widget: markdown, required: false }
+      - label: "Work Images"
+        name: "images"
+        widget: "list"
+        summary: '{{fields.image}}'
+        field: {label: Image, name: image, widget: image}
+  - name: show
+    label: Shows
+    folder: data/shows
+    media_folder: images/{{slug}}
+    create: true
+    editor:
+      preview: false
+    fields:
+      - { name: date, label: Show Date, widget: datetime }
+      - { name: title, label: Show Title, required: false }
+      - { name: description, label: Show Description, widget: markdown, required: false }
+      - label: "Show Works"
+        name: "show-works"
+        widget: "list"
+        summary: '{{fields.works}}'
+        field: {widget: relation, name: works, collection: work, value_field: work.title, search_fields: [work.title]}
