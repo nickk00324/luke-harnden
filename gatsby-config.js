@@ -9,6 +9,13 @@ module.exports = {
     `gatsby-transformer-remark`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/data/works`,
+        name: `works`,
+      },
+    },
     // {
     //   resolve: `gatsby-plugin-manifest`,
     //   options: {
