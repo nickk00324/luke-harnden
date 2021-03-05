@@ -1,7 +1,8 @@
 backend:
-  repo: nickk00324/luke-harnden
-  name: git-gateway
-  branch: main
+  # repo: nickk00324/luke-harnden
+  # name: git-gateway
+  # branch: main
+  name: test-repo
 
 media_folder: data/images
 
@@ -36,5 +37,7 @@ collections:
       - { name: description, label: Show Description, widget: markdown, required: false }
       - label: "Show Works"
         name: "show-works"
-        widget: "list"
-        field: {widget: relation, label: "works", name: "work", collection: "works", value_field: 'title', search_fields: ['title']}
+        widget: relation
+        collection: works
+        value_field: title
+        search_fields: [title]
