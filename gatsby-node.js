@@ -45,7 +45,7 @@ exports.createPages = ({ graphql, actions }) => {
     `
       query MyQuery {
         works: allMarkdownRemark(
-          filter: { frontmatter: { type: { eq: "work" } } }
+          filter: { fields: { collection: { eq: "works" } } }
         ) {
           edges {
             node {
@@ -57,7 +57,7 @@ exports.createPages = ({ graphql, actions }) => {
           }
         }
         shows: allMarkdownRemark(
-          filter: { frontmatter: { type: { eq: "show" } } }
+          filter: { fields: { collection: { eq: "shows" } } }
         ) {
           edges {
             node {

@@ -18,15 +18,6 @@ collections:
       - { name: title, label: Title, required: false }
       - { name: description, label: Description, widget: markdown, required: false }
       - { name: medium, label: Medium, widget: markdown, required: false }
-      - label: "Show(s) Appeared In"
-        name: "show"
-        widget: relation
-        collection: shows
-        value_field: title
-        multiple: true
-        required: false
-        search_fields: ["title"]
-        display_fields: ["title"]
       - label: "Work Images"
         name: "images"
         widget: "list"
@@ -44,4 +35,13 @@ collections:
       - { name: title, label: Show Title, required: false }
       - { name: description, label: Show Description, widget: markdown, required: false }
       - { name: location, label: Location }
+      - label: "Show Works"
+        name: "work"
+        widget: relation
+        collection: works
+        value_field: '{{slug}}'
+        multiple: true
+        required: false
+        search_fields: ["title"]
+        display_fields: ["title"]
      
