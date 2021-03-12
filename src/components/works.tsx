@@ -41,23 +41,19 @@ const Works = () => {
       }
     }
   `)
-
   enum OrgType {
     ByYear,
     ByExhibition,
   }
-
   const handleOrgTypeChange = (ot: OrgType) => {
     if (ot === OrgType.ByYear) setOrgType(OrgType.ByYear)
     else setOrgType(OrgType.ByExhibition)
   }
-
   const allWorks = dataWorks.works.edges
   const [worksByYear, setWorksByYear] = React.useState<{ [year: string]: any }>(
     {}
   )
   const [exhibitions, setExhibitions] = React.useState()
-
   const getWorksByDate = () => {
     const wbd: { [year: string]: any } = {}
     allWorks.forEach((w: any) => {
@@ -70,12 +66,10 @@ const Works = () => {
     })
     return wbd
   }
-
   React.useEffect(() => {
     if (!dataWorks) return
     setWorksByYear(getWorksByDate())
   }, [dataWorks])
-
   const [orgType, setOrgType] = React.useState(OrgType.ByYear)
   return (
     <Container>

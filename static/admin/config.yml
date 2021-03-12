@@ -36,7 +36,7 @@ collections:
       - { name: description, label: Show Description, widget: markdown, required: false }
       - { name: location, label: Location }
       - label: "Show Works"
-        name: "work"
+        name: "works"
         widget: relation
         collection: works
         value_field: '{{slug}}'

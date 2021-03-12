@@ -17,6 +17,7 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
     const parent = getNode(node.parent)
     const collection = parent.sourceInstanceName
     const value = createFilePath({ node, getNode })
+    console.log(value)
     createNodeField({
       node,
       name: "collection",
@@ -167,14 +168,17 @@ exports.sourceNodes = ({ actions, getNodes, getNode, getNodesByType }) => {
     )
     const workNodesForShow = {}
     showNodes.forEach(sn => {
-      const works = getNodesByType("MarkdownRemark").filter(n =>
-        sn.frontmatter.works.includes(n.fields.slug)
-      )
+      console.log(sn)
+      const works = getNodesByType("MarkdownRemark").filter(n => {
+        console.log(n)
+        return sn.frontmatter.works.includes(n.fields.slug)
+      })
       works.forEach(w => {
         if (!(sn.id in workNodesForShow)) workNodesForShow[sn.id] = []
         workNodesForShow[sn.id].push(w.id)
       })
     })
+    console.log(workNodesForShow)
     Object.entries(workNodesForShow).forEach(([showNodeId, workIds]) => {
       createNodeField({
         node: getNode(showNodeId),
