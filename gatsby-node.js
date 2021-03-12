@@ -117,19 +117,47 @@ exports.createPages = ({ graphql, actions }) => {
   })
 }
 
+// exports.sourceNodes = ({ actions, getNodes, getNode, getNodesByType }) => {
+//   const { createNodeField } = actions
+//   const files = getNodesByType("File")
+//   mdxCount = files.filter(fileNode => fileNode.ext === ".md").length
+//   console.log(`ENTER sourceNodes(); expect count = ${mdxCount}`)
+//   const finished = () => {
+//     const showNodes = getNodesByType("MarkdownRemark").filter(
+//       n => n.fields.collection === "shows"
+//     )
+//     const workNodes = getNodesByType("MarkdownRemark").filter(
+//       n => n.fields.collection === "works"
+//     )
+//     const workNodesForShow = {}
+//     showNodes.forEach(sn => {
+//       const works = workNodes.filter(
+//         wn => wn.frontmatter.show === sn.frontmatter.title
+//       )
+//       works.forEach(w => {
+//         if (!(sn.id in workNodesForShow)) workNodesForShow[sn.id] = []
+//         workNodesForShow[sn.id].push(w.id)
+//       })
+//     })
+//     Object.entries(workNodesForShow).forEach(([showNodeId, workIds]) => {
+//       createNodeField({
+//         node: getNode(showNodeId),
+//         name: `works`,
+//         value: workIds,
+//       })
+//     })
+//     console.log(showNodes[0])
+//   }
+//   return new Promise(resolve => {
+//     resolver = resolve
+//     tryResolve()
+//   }).then(() => {
+//     finished()
+//   })
+// }
+
 exports.sourceNodes = ({ actions, getNodes, getNode, getNodesByType }) => {
   const { createNodeField } = actions
-
-  // const shows = getNodesByType("MarkdownRemark").filter(
-  //   s => s.fields.collection === "shows"
-  // )
-  // const works = getNodesByType("MarkdownRemark")
-  // shows.forEach(s => {
-  //   const worksForShow = works.filter(
-  //     w => w.frontmatter.show === s.frontmatter.title
-  //   )
-  //   console.log(works)
-  // })
   const files = getNodesByType("File")
   mdxCount = files.filter(fileNode => fileNode.ext === ".md").length
   console.log(`ENTER sourceNodes(); expect count = ${mdxCount}`)
@@ -137,13 +165,10 @@ exports.sourceNodes = ({ actions, getNodes, getNode, getNodesByType }) => {
     const showNodes = getNodesByType("MarkdownRemark").filter(
       n => n.fields.collection === "shows"
     )
-    const workNodes = getNodesByType("MarkdownRemark").filter(
-      n => n.fields.collection === "works"
-    )
     const workNodesForShow = {}
     showNodes.forEach(sn => {
-      const works = workNodes.filter(
-        wn => wn.frontmatter.show === sn.frontmatter.title
+      const works = getNodesByType("MarkdownRemark").filter(n =>
+        sn.frontmatter.works.includes(n.fields.slug)
       )
       works.forEach(w => {
         if (!(sn.id in workNodesForShow)) workNodesForShow[sn.id] = []
@@ -157,7 +182,6 @@ exports.sourceNodes = ({ actions, getNodes, getNode, getNodesByType }) => {
         value: workIds,
       })
     })
-    console.log(showNodes[0])
   }
   return new Promise(resolve => {
     resolver = resolve
@@ -165,42 +189,4 @@ exports.sourceNodes = ({ actions, getNodes, getNode, getNodesByType }) => {
   }).then(() => {
     finished()
   })
-
-  // const worksInShow = {}
-  // // iterate thorugh all markdown nodes to link books to author
-  // // and build author index
-  // const markdownNodes = getNodes()
-  //   .filter(node => node.internal.type === `MarkdownRemark`)
-  //   .forEach(node => {
-  //     if (node.frontmatter.show) {
-  //       const showNode = getNodes().find(
-  //         node2 =>
-  //           node2.internal.type === `MarkdownRemark` &&
-  //           node2.frontmatter.title === node.frontmatter.show
-  //       )
-
-  //       if (showNode) {
-  //         createNodeField({
-  //           node,
-  //           name: `show`,
-  //           value: showNode.id,
-  //         })
-
-  //         // if it's first time for this author init empty array for his books
-  //         if (!(showNode.id in worksInShow)) {
-  //           worksInShow[showNode.id] = []
-  //         }
-  //         // add book to this author
-  //         worksInShow[showNode.id].push(node.id)
-  //       }
-  //     }
-  //   })
-
-  // Object.entries(worksInShow).forEach(([showNodeId, workIds]) => {
-  //   createNodeField({
-  //     node: getNode(showNodeId),
-  //     name: `works`,
-  //     value: workIds,
-  //   })
-  // })
 }
