@@ -2,7 +2,7 @@ import React from "react"
 import Home from "../components/home"
 import Layout from "../components/layout"
 
-const IndexPage = () => {
+const Index = () => {
   return (
     <Layout>
       <Home />
@@ -10,4 +10,4 @@ const IndexPage = () => {
   )
 }
 
-export default IndexPage
+export default Index

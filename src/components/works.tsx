@@ -2,6 +2,7 @@ import React from "react"
 import styled from "styled-components"
 import { Link, graphql, useStaticQuery } from "gatsby"
 import Image from "gatsby-image"
+import Shows from "./shows"
 
 const Container = styled.div`
   .nav {
@@ -14,9 +15,11 @@ const Container = styled.div`
 `
 
 const Works = () => {
-  const data = useStaticQuery(graphql`
+  const dataWorks = useStaticQuery(graphql`
     query MyQuery {
-      allMarkdownRemark {
+      works: allMarkdownRemark(
+        filter: { fields: { collection: { eq: "works" } } }
+      ) {
         edges {
           node {
             fields {
@@ -24,6 +27,7 @@ const Works = () => {
             }
             frontmatter {
               title
+              date
               images {
                 childImageSharp {
                   fluid {
@@ -44,11 +48,34 @@ const Works = () => {
   }
 
   const handleOrgTypeChange = (ot: OrgType) => {
-    if (ot === OrgType.ByYear) setOrgType(OrgType.ByExhibition)
-    else setOrgType(OrgType.ByYear)
+    if (ot === OrgType.ByYear) setOrgType(OrgType.ByYear)
+    else setOrgType(OrgType.ByExhibition)
   }
 
-  const allWorks = data.allMarkdownRemark.edges
+  const allWorks = dataWorks.works.edges
+  const [worksByYear, setWorksByYear] = React.useState<{ [year: string]: any }>(
+    {}
+  )
+  const [exhibitions, setExhibitions] = React.useState()
+
+  const getWorksByDate = () => {
+    const wbd: { [year: string]: any } = {}
+    allWorks.forEach((w: any) => {
+      const year = new Date(w.node.frontmatter.date).getFullYear()
+      if (wbd[year]) {
+        wbd[year].push(w)
+      } else {
+        wbd[year] = [w]
+      }
+    })
+    return wbd
+  }
+
+  React.useEffect(() => {
+    if (!dataWorks) return
+    setWorksByYear(getWorksByDate())
+  }, [dataWorks])
+
   const [orgType, setOrgType] = React.useState(OrgType.ByYear)
   return (
     <Container>
@@ -58,7 +85,11 @@ const Works = () => {
           by exhibition
         </div>
       </div>
-      {orgType ? <ByYear works={allWorks} /> : <ByExhibition />}
+      {orgType === OrgType.ByYear ? (
+        <ByYear works={worksByYear} />
+      ) : (
+        <ByExhibition />
+      )}
     </Container>
   )
 }
@@ -82,14 +113,32 @@ const WorkCard = (props: WorkCardProps) => {
 }
 
 type ByYearProps = {
-  works: any
+  works: { [year: string]: any }
 }
 
 const ByYear = (props: ByYearProps) => {
   const { works } = props
+  const years = Object.keys(works).sort()
+
+  console.log(years)
   return (
     <div>
-      {works.map((w: any) => {
+      {years.map(y => (
+        <WorkYear year={y} works={works[y]} />
+      ))}
+    </div>
+  )
+}
+
+type WorkYearProps = {
+  year: string
+  works: any
+}
+const WorkYear = (props: WorkYearProps) => {
+  return (
+    <div>
+      <h2>{props.year}</h2>
+      {props.works.map((w: any) => {
         const { title, images } = w.node.frontmatter
         return <WorkCard img={images[0]} url={w.node.fields.slug} key={title} />
       })}
@@ -98,11 +147,7 @@ const ByYear = (props: ByYearProps) => {
 }
 
 const ByExhibition = () => {
-  return (
-    <div>
-      <div>this is by exhibition</div>
-    </div>
-  )
+  return <Shows />
 }
 
 export default Works

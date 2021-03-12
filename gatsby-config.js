@@ -4,18 +4,14 @@ module.exports = {
     description: `TBD`,
     author: `nickk`,
   },
+  mapping: {
+    "MarkdownRemark.fields.works": `MarkdownRemark`,
+  },
   plugins: [
-    `gatsby-plugin-react-helmet`,
     `gatsby-transformer-remark`,
+    `gatsby-plugin-react-helmet`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        path: `${__dirname}/data/works`,
-        name: `works`,
-      },
-    },
     // {
     //   resolve: `gatsby-plugin-manifest`,
     //   options: {
@@ -29,12 +25,24 @@ module.exports = {
     //   },
     // },
     "gatsby-plugin-styled-components",
-    "gatsby-transformer-json",
-    "gatsby-plugin-transition-link",
     "gatsby-plugin-netlify-cms",
     // this (optional) plugin enables Progressive Web App + Offline functionality
     // To learn more, visit: https://gatsby.dev/offline
     // `gatsby-plugin-offline`,
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/data/works`,
+        name: `works`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/data/shows`,
+        name: `shows`,
+      },
+    },
   ],
   // pathPrefix: "/full-service",
 }
