@@ -1,8 +1,8 @@
 backend:
-  # repo: nickk00324/luke-harnden
-  # name: git-gateway
-  # branch: main
-  name: test-repo
+  repo: nickk00324/luke-harnden
+  name: git-gateway
+  branch: main
+  # name: test-repo
 
 media_folder: data/images
 
