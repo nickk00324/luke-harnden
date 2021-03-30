@@ -1,6 +1,11 @@
 import React from "react"
 import styled from "styled-components"
 import { Link, graphql, useStaticQuery } from "gatsby"
+import { getYearFromDate } from "../utils/dates"
+import { getThingsByDate } from "../utils/organize"
+import ThingYear from "./common/thingYear"
+import Show from "./show"
+import Layout from "./layout"
 
 const Container = styled.div``
 
@@ -14,10 +19,12 @@ const Shows = () => {
           node {
             fields {
               slug
+              collection
             }
             frontmatter {
               title
-              date
+              start_date
+              end_date
               description
               location
             }
@@ -29,41 +36,16 @@ const Shows = () => {
 
   const allShows = dataShows.shows.edges
   console.log(allShows)
+  const showsByDate = getThingsByDate(allShows)
+  const years = Object.keys(showsByDate).sort(
+    (a, b) => new Date(b).getTime() - new Date(a).getTime()
+  )
   return (
     <Container>
-      {allShows.map((s: any) => (
-        <ShowCard
-          title={s.node.frontmatter.title}
-          year={s.node.frontmatter.date}
-          slug={s.node.fields.slug}
-          location={s.node.frontmatter.location}
-        />
+      {years.map((y: any) => (
+        <ThingYear year={y} things={showsByDate[y]} isWorks={false} />
       ))}
     </Container>
-  )
-}
-
-type ShowCardProps = {
-  year: string
-  slug: string
-  title: string
-  location: string
-}
-
-const ShowCard = (props: ShowCardProps) => {
-  const formatDate = (date: string) => {
-    return new Date(date).getFullYear()
-  }
-  return (
-    <div>
-      <Link to={`/show${props.slug}`}>
-        <div>{formatDate(props.year)}</div>
-        <div>
-          <em>{props.title}</em>
-        </div>
-        <div>{props.location}</div>
-      </Link>
-    </div>
   )
 }
 

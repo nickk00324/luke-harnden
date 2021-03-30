@@ -1,7 +1,8 @@
 backend:
-  repo: nickk00324/luke-harnden
-  name: git-gateway
-  branch: main
+  # repo: nickk00324/luke-harnden
+  # name: git-gateway
+  # branch: main
+  name: test-repo
 
 media_folder: data/images
 
@@ -14,13 +15,14 @@ collections:
     editor:
       preview: false
     fields:
-      - { name: date, label: Date, widget: datetime }
-      - { name: title, label: Title, required: false }
-      - { name: description, label: Description, widget: markdown, required: false }
-      - { name: medium, label: Medium, widget: markdown, required: false }
+      - { name: date, label: Date, widget: datetime, hint: "the exact day doesn't matter, used for organizing into years" }
+      - { name: title, label: Title, hint: "doesn't necessarily need to be the title of the work, just something to distinguish it from other works" }
+      - { name: description, label: Description, widget: markdown, required: false, hint: 'this for anything you want to say about the particular work' }
+      - { name: medium, label: Medium, widget: markdown, required: false, hint: 'year medium size etc.' }
       - label: "Work Images"
         name: "images"
         widget: "list"
+        hint: 'the image in the first slot will be the one used for the thumbnail'
         summary: '{{fields.image}}'
         field: {label: Image, name: image, widget: image}
   - name: shows
@@ -31,10 +33,11 @@ collections:
     editor:
       preview: false
     fields:
-      - { name: date, label: Show Date, widget: datetime }
-      - { name: title, label: Show Title, required: false }
-      - { name: description, label: Show Description, widget: markdown, required: false }
-      - { name: location, label: Location }
+      - { name: start_date, label: Start Date, widget: datetime }
+      - { name: end_date, label: End Date, widget: datetime }
+      - { name: title, label: Show Title }
+      - { name: description, label: Show Description, widget: markdown, required: false, hint: 'press release, etc.' }
+      - { name: location, label: Location, hint: 'gallery name, city, etc' }
       - label: "Show Works"
         name: "works"
         widget: relation

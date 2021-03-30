@@ -118,79 +118,65 @@ exports.createPages = ({ graphql, actions }) => {
   })
 }
 
-// exports.sourceNodes = ({ actions, getNodes, getNode, getNodesByType }) => {
-//   const { createNodeField } = actions
-//   const files = getNodesByType("File")
-//   mdxCount = files.filter(fileNode => fileNode.ext === ".md").length
-//   console.log(`ENTER sourceNodes(); expect count = ${mdxCount}`)
-//   const finished = () => {
-//     const showNodes = getNodesByType("MarkdownRemark").filter(
-//       n => n.fields.collection === "shows"
-//     )
-//     const workNodes = getNodesByType("MarkdownRemark").filter(
-//       n => n.fields.collection === "works"
-//     )
-//     const workNodesForShow = {}
-//     showNodes.forEach(sn => {
-//       const works = workNodes.filter(
-//         wn => wn.frontmatter.show === sn.frontmatter.title
-//       )
-//       works.forEach(w => {
-//         if (!(sn.id in workNodesForShow)) workNodesForShow[sn.id] = []
-//         workNodesForShow[sn.id].push(w.id)
-//       })
-//     })
-//     Object.entries(workNodesForShow).forEach(([showNodeId, workIds]) => {
-//       createNodeField({
-//         node: getNode(showNodeId),
-//         name: `works`,
-//         value: workIds,
-//       })
-//     })
-//     console.log(showNodes[0])
-//   }
-//   return new Promise(resolve => {
-//     resolver = resolve
-//     tryResolve()
-//   }).then(() => {
-//     finished()
-//   })
-// }
-
 exports.sourceNodes = ({ actions, getNodes, getNode, getNodesByType }) => {
   const { createNodeField } = actions
   const files = getNodesByType("File")
   mdxCount = files.filter(fileNode => fileNode.ext === ".md").length
   console.log(`ENTER sourceNodes(); expect count = ${mdxCount}`)
   const finished = () => {
-    const showNodes = getNodesByType("MarkdownRemark").filter(
-      n => n.fields.collection === "shows"
-    )
-    const workNodesForShow = {}
-    showNodes.forEach(sn => {
-      console.log(sn)
-      const works = getNodesByType("MarkdownRemark").filter(n => {
-        console.log(n)
-        return sn.frontmatter.works.includes(n.fields.slug)
-      })
-      works.forEach(w => {
-        if (!(sn.id in workNodesForShow)) workNodesForShow[sn.id] = []
-        workNodesForShow[sn.id].push(w.id)
-      })
-    })
-    console.log(workNodesForShow)
-    Object.entries(workNodesForShow).forEach(([showNodeId, workIds]) => {
-      createNodeField({
-        node: getNode(showNodeId),
-        name: `works`,
-        value: workIds,
-      })
-    })
+    makeConnections(getNodesByType, createNodeField, getNode)
   }
   return new Promise(resolve => {
     resolver = resolve
     tryResolve()
   }).then(() => {
     finished()
+  })
+}
+
+exports.createSchemaCustomization = ({ actions }) => {
+  const { createTypes } = actions
+  const typeDefs = `
+    type MarkdownRemarkFrontmatter implements Node {
+      description: String
+      medium: String
+      works: [String]
+    }
+  `
+  createTypes(typeDefs)
+}
+function makeConnections(getNodesByType, createNodeField, getNode) {
+  const showNodes = getNodesByType("MarkdownRemark").filter(
+    n => n.fields.collection === "shows"
+  )
+  const workNodesForShow = {}
+  const showNodesForWork = {}
+  showNodes.forEach(sn => {
+    const works = getNodesByType("MarkdownRemark").filter(n => {
+      console.log(n.fields.slug.split("/")[1])
+      console.log(sn.frontmatter.works)
+      return sn.frontmatter.works.includes(n.fields.slug.split("/")[1])
+    })
+    works.forEach(w => {
+      if (!(sn.id in workNodesForShow)) workNodesForShow[sn.id] = []
+      workNodesForShow[sn.id].push(w.id)
+      if (!(w.id in showNodesForWork)) showNodesForWork[w.id] = []
+      showNodesForWork[w.id].push(sn.id)
+    })
+  })
+  console.log(showNodesForWork)
+  Object.entries(workNodesForShow).forEach(([showNodeId, workIds]) => {
+    createNodeField({
+      node: getNode(showNodeId),
+      name: `works`,
+      value: workIds,
+    })
+  })
+  Object.entries(showNodesForWork).forEach(([workNodeId, showIds]) => {
+    createNodeField({
+      node: getNode(workNodeId),
+      name: `shows`,
+      value: showIds,
+    })
   })
 }

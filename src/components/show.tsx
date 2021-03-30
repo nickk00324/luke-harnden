@@ -3,14 +3,17 @@ import styled from "styled-components"
 import Layout from "./layout"
 import { Link, graphql } from "gatsby"
 import Image from "gatsby-image"
+import Carousel from "./carousel"
+import { getShowDates } from "../utils/dates"
+import Markdown from "react-markdown"
 
 const Container = styled.div``
-
-const Images = styled.div`
-  width: 800px;
-  display: flex;
+const Info = styled.div`
+  margin-top: 16px;
 `
-const Info = styled.div``
+const Desc = styled.div`
+  margin: 16px 0;
+`
 
 type ShowProps = {
   data: any
@@ -18,76 +21,58 @@ type ShowProps = {
 
 const Show = (props: ShowProps) => {
   console.log(props)
-  const works = props.data.markdownRemark.fields.works
+  const { show } = props.data
+  const { works } = show.fields
+  const getWorkImages = () => {
+    const wi: any = []
+    works.forEach((w: any) => {
+      wi.push(...w.details.images)
+    })
+    return wi
+  }
+  const workImages = getWorkImages()
+  const { title, start_date, end_date, description, location } = show.details
+  const date = getShowDates(start_date, end_date)
 
   return (
     <Layout>
-      <Container>
-        <Images>
-          {works.map(w => (
-            <WorkHolder images={w.frontmatter.images} slug={w.fields.slug} />
-          ))}
-        </Images>
-      </Container>
+      <Carousel images={workImages} />
+      <Info>
+        <p>
+          <em>{title}</em>
+        </p>
+        <p>{date}</p>
+        <p>{location}</p>
+      </Info>
+      <Desc>
+        <Markdown>{description}</Markdown>
+      </Desc>
     </Layout>
   )
 }
 
 export default Show
 
-type ImageThumbProps = {
-  image: any
-  url: string
-}
-
-const ThumbContainer = styled.div``
-
-const WorkContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  width: 300px;
-`
-
-const WorkHolder = (props: any) => {
-  return (
-    <WorkContainer>
-      {props.images.map(i => (
-        <ImageThumb image={i} url={props.slug} />
-      ))}
-    </WorkContainer>
-  )
-}
-
-const Img = styled(Image)`
-  width: 300px;
-  height: 300px;
-`
-const ImageThumb = (props: ImageThumbProps) => {
-  return (
-    <ThumbContainer>
-      <Link to={`/work${props.url}`}>
-        <Img fluid={props.image.childImageSharp.fluid} />
-      </Link>
-    </ThumbContainer>
-  )
-}
-
 export const query = graphql`
-  query workQ($id: String!) {
-    markdownRemark(id: { eq: $id }) {
-      frontmatter {
-        date
+  query showQ($id: String!) {
+    show: markdownRemark(id: { eq: $id }) {
+      details: frontmatter {
+        start_date
+        end_date
+        title
+        location
+        description
       }
       fields {
         works {
           fields {
             slug
           }
-          frontmatter {
+          details: frontmatter {
             title
             images {
               childImageSharp {
-                fluid {
+                fluid(sizes: "(max-width: 1200px) calc(100vw - 40px), 1200px") {
                   ...GatsbyImageSharpFluid
                 }
               }

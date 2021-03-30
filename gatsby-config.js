@@ -4,9 +4,6 @@ module.exports = {
     description: `TBD`,
     author: `nickk`,
   },
-  mapping: {
-    "MarkdownRemark.fields.works": `MarkdownRemark`,
-  },
   plugins: [
     `gatsby-transformer-remark`,
     `gatsby-plugin-react-helmet`,
@@ -44,5 +41,9 @@ module.exports = {
       },
     },
   ],
+  mapping: {
+    "MarkdownRemark.fields.works": `MarkdownRemark`,
+    "MarkdownRemark.fields.shows": `MarkdownRemark`,
+  },
   // pathPrefix: "/full-service",
 }

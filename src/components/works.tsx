@@ -3,6 +3,8 @@ import styled from "styled-components"
 import { Link, graphql, useStaticQuery } from "gatsby"
 import Image from "gatsby-image"
 import Shows from "./shows"
+import { getThingsByDate } from "../utils/organize"
+import ThingYear from "./common/thingYear"
 
 const Container = styled.div`
   .nav {
@@ -24,13 +26,16 @@ const Works = () => {
           node {
             fields {
               slug
+              collection
             }
             frontmatter {
               title
               date
               images {
                 childImageSharp {
-                  fluid {
+                  fluid(
+                    sizes: "(max-width: 1200px) calc(100vw - 40px), 1200px"
+                  ) {
                     ...GatsbyImageSharpFluid
                   }
                 }
@@ -41,68 +46,22 @@ const Works = () => {
       }
     }
   `)
-  enum OrgType {
-    ByYear,
-    ByExhibition,
-  }
-  const handleOrgTypeChange = (ot: OrgType) => {
-    if (ot === OrgType.ByYear) setOrgType(OrgType.ByYear)
-    else setOrgType(OrgType.ByExhibition)
-  }
+
   const allWorks = dataWorks.works.edges
   const [worksByYear, setWorksByYear] = React.useState<{ [year: string]: any }>(
     {}
   )
-  const [exhibitions, setExhibitions] = React.useState()
-  const getWorksByDate = () => {
-    const wbd: { [year: string]: any } = {}
-    allWorks.forEach((w: any) => {
-      const year = new Date(w.node.frontmatter.date).getFullYear()
-      if (wbd[year]) {
-        wbd[year].push(w)
-      } else {
-        wbd[year] = [w]
-      }
-    })
-    return wbd
-  }
   React.useEffect(() => {
     if (!dataWorks) return
-    setWorksByYear(getWorksByDate())
+    setWorksByYear(getThingsByDate(allWorks, true))
   }, [dataWorks])
-  const [orgType, setOrgType] = React.useState(OrgType.ByYear)
+
+  console.log(worksByYear)
+
   return (
     <Container>
-      <div className="nav">
-        <div onClick={() => handleOrgTypeChange(OrgType.ByYear)}>by year</div>
-        <div onClick={() => handleOrgTypeChange(OrgType.ByExhibition)}>
-          by exhibition
-        </div>
-      </div>
-      {orgType === OrgType.ByYear ? (
-        <ByYear works={worksByYear} />
-      ) : (
-        <ByExhibition />
-      )}
+      <ByYear works={worksByYear} />
     </Container>
-  )
-}
-
-const CardContainer = styled.div``
-
-type WorkCardProps = {
-  img: any
-  url: string
-}
-
-const WorkCard = (props: WorkCardProps) => {
-  const { img, url } = props
-  return (
-    <CardContainer>
-      <Link to={`/work${url}`}>
-        <Image fluid={img.childImageSharp.fluid} />
-      </Link>
-    </CardContainer>
   )
 }
 
@@ -112,36 +71,17 @@ type ByYearProps = {
 
 const ByYear = (props: ByYearProps) => {
   const { works } = props
-  const years = Object.keys(works).sort()
-
+  const years = Object.keys(works).sort(
+    (a, b) => new Date(b).getTime() - new Date(a).getTime()
+  )
   console.log(years)
   return (
     <div>
       {years.map(y => (
-        <WorkYear year={y} works={works[y]} />
+        <ThingYear year={y} things={works[y]} isWorks={true} />
       ))}
     </div>
   )
-}
-
-type WorkYearProps = {
-  year: string
-  works: any
-}
-const WorkYear = (props: WorkYearProps) => {
-  return (
-    <div>
-      <h2>{props.year}</h2>
-      {props.works.map((w: any) => {
-        const { title, images } = w.node.frontmatter
-        return <WorkCard img={images[0]} url={w.node.fields.slug} key={title} />
-      })}
-    </div>
-  )
-}
-
-const ByExhibition = () => {
-  return <Shows />
 }
 
 export default Works
